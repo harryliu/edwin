@@ -1,0 +1,19 @@
+=======================
+exception
+=======================
+    self.stream.flush()
+ValueError: I/O operation on closed file
+Error in sys.exitfunc:
+
+
+=======================
+fix
+=======================
+Line 194:
+self.stream.flush()
+
+Add closed evaluation before flush(),
+if self.stream.closed==False:
+	self.stream.flush()
+
+

@@ -1,0 +1,227 @@
+{% if not is_xhr|default(false) %}{% extends "base_no_sidebar.html" %}{% endif -%}
+                     
+
+{% block content %}
+        
+   <div id="overview">  
+          <div class="row"> 
+            <div class="col-md-12">
+                <div  class="panel panel-primary"  >
+                    <div class="panel-heading"><span class="glyphicon glyphicon-task">
+                      </span>{{check_item.itm_title}}
+                    </div>
+                    <table class="table table-striped table-bordered">
+                        <tr>
+                            <td class="col-md-2" ><b>Item code</b></td>
+                            <td class="col-md-4">{{check_item.itm_code}}</td>
+
+                            <td class="col-md-2"><b>Item title</b></td>
+                            <td class="col-md-4">{{check_item.itm_title}}</td>                            
+                        </tr>
+                      
+                        <tr>
+                            <td><b>Category</b></td>
+                            <td>{{check_item.itm_category}}</td>
+
+                            <td><b>Enabled flag</b></td>
+                            <td>{{check_item.enabled_flag}}</td>                                
+                        </tr>
+                        <tr>
+                            <td><b>Host</b></td>
+                            <td>{{check_item.host}}</td>
+
+                            <td><b>Check script</b></td>
+                            <td>{% if check_item.check_script %} {{check_item.check_script}} {% endif %} </td>                            
+                        </tr>
+                        <tr>
+                            <td><b>Number result?</b></td>
+                            <td>{{check_item.check_value_is_number}}</td>
+                            
+                            <td><b>Check interval(minute)</b></td>
+                            <td>{{check_item.check_interval_minute}}</td>                                
+                        </tr>
+                        <tr>
+                            <td><b>Warning limit</b></td>
+                            <td>{% if check_item.warning_limit %}{{check_item.warning_limit}} {% endif %}</td>
+                            
+                            <td><b>Critical limit</b></td>
+                            <td>{% if check_item.critical_limit %}{{check_item.critical_limit}} {% endif %}</td>
+                        </tr>
+
+                        <tr>
+                            <td><b>Owner team list</b></td>
+                            <td>
+                                {% for owner in owner_teams %}
+                                 <a href="/teams/{{owner}}" target="_blank">
+                                   {{owner}}
+                                 </a>    
+                                  ;                            
+                                {% endfor %}
+                            </td>                                     
+                            
+                            <td><b>Warning mailto(cc)</b></td>
+                            <td>{% if check_item.warning_mail_cc %} {{check_item.warning_mail_cc}} {% endif %} </td>
+                               
+                        </tr> 
+                                                       
+                        <tr>
+                            <td><b>Critical mailto(cc)</b></td>
+                            <td>{% if check_item.critical_mail_cc %} {{check_item.critical_mail_cc}} {% endif %} </td>
+                            
+                            <td><b>Enable SMS for critical</b></td>
+                            <td>{{check_item.critical_sms_flag}}</td>
+                        </tr>     
+                        
+                        <tr>
+                            <td><b>Enable call for critical</b></td>
+                            <td>{{check_item.critical_call_flag}}</td>   
+                            
+                            <td><b>Allow repeated mail alarm</b></td>
+                            <td>{{check_item.allow_repeated_mail_alarm}}</td>                                                                
+                        </tr>     
+                        
+
+                        <tr>
+                            <td><b>Allow repeated call alarm</b></td>
+                            <td>{{check_item.allow_repeated_call_alarm}}</td>   
+                            
+                            <td><b>Allow repeated SMS alarm</b></td>
+                            <td>{{check_item.allow_repeated_sms_alarm}}</td>                                                                
+                        </tr>                          
+ 
+                        <tr>
+                            <td ><b>Description</b></td>
+                            <td colspan=3>
+                              {% if check_item.description %}
+                                {{check_item.description[:500]}}
+                              {% endif %}
+                              </td>
+                        </tr>
+                        
+                        <tr>
+                            <td><b>Last status</b></td>
+                            <td>{% if check_item.last_status %}  {{check_item.last_status}} {% endif %}</td>
+                            
+                            <td><b>Last value</b></td>
+                            <td >{% if check_item.last_value != None  %}{{check_item.last_value}} {% endif %} </td>   
+                            
+                        </tr>   
+                        <tr>
+                            <td><b>Last timestamp</b></td>
+                            <td> 
+                                {% if check_item.last_check_timestamp %}
+                                     {{check_item.last_check_timestamp}}
+                                 {% endif %} 
+                            </td>        
+                            <td><b></b></td>
+                            <td></td>    
+                        </tr>  
+                        <tr>
+                            <td><b>Last message</b></td>
+                            <td colspan=3>
+                              {% if check_item.last_detail_msg %}
+                                {{check_item.last_detail_msg[:1000]}}
+                              {% endif %}                            
+                            </td>
+                        </tr>                        
+                        
+                    </table>
+                </div>
+            </div> 
+        </div> 
+         
+    </div>     
+    
+     
+ 
+    <ul id="myTab" class="nav nav-tabs" >
+      {% if check_item.check_value_is_number=='Y'%}
+      <li class="active"><a data-toggle="tab" href="#valueStatistics">Value statistics</a></li>
+      {% endif %}    
+      <li 
+          {% if check_item.check_value_is_number!='Y'%} 
+          class="active"
+          {% endif %}
+        >
+        <a data-toggle="tab" href="#statusStatistics">Status statistics</a>
+      </li>
+
+    </ul>    
+    
+    <div id="myTabContent" class="tab-content">
+
+    {% if check_item.check_value_is_number=='Y'%}
+      <div class="tab-pane active" id="valueStatistics">
+           <div class="row"> 
+             <div class="col-md-12">
+                <figure>
+                  <!-- the following safe filter is must -->
+                 {% if svg_value_stat_short  %}
+                   {{svg_value_stat_short|safe}}  
+                 {% endif %}                 
+                </figure> 
+            </div>          
+           </div>
+           
+           <br/>
+           
+           <div class="row"> 
+             <!-- <div style="width:1005px;overflow-x:auto;overflow-y:hidden;">  -->
+             <!-- <div style="width:1260px;overflow-x:auto;overflow-y:hidden;">  -->
+             <div class="col-md-12 col-lg-12" style="overflow-x:auto;overflow-y:hidden;">
+                <figure>
+                  <!-- the following safe filter is must -->
+                 {% if svg_value_stat_long  %}
+                   {{svg_value_stat_long|safe}}  
+                 {% endif %}
+                </figure>        
+             </div> 
+           </div> 
+           <br/>
+           <br/> 
+      </div>  
+      {% endif %}
+    
+      <div 
+          {% if check_item.check_value_is_number=='Y'%} 
+          class="tab-pane"
+          {% else %}
+          class="tab-pane active"
+          {% endif %}
+        id="statusStatistics">
+        
+           <div class="row"> 
+             <div class="col-md-12">
+                <figure>
+                  <!-- the following safe filter is must -->
+                  {% if svg_status_stat_short %}
+                    {{svg_status_stat_short|safe}}
+                  {% endif %}    
+                </figure> 
+            </div>          
+           </div>
+           
+           <br/>
+           <div class="row"> 
+             <!-- <div style="width:1005px;overflow-x:auto;overflow-y:hidden;">  -->
+             <!-- <div style="width:1260px;overflow-x:auto;overflow-y:hidden;">  -->
+             <div class="col-md-12 col-lg-12" style="overflow-x:auto;overflow-y:hidden;">
+                <figure>
+                  <!-- the following safe filter is must -->
+                  {% if svg_status_stat_long %}
+                    {{svg_status_stat_long|safe}}
+                  {% endif %}                     
+                </figure>        
+             </div> 
+           </div>  
+           <br/>
+           <br/> 
+      </div>   
+      
+    
+       
+    </div>             
+ 
+      
+                 
+{% endblock %}

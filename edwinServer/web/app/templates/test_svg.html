@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{title}}</title>
+    <!-- 这里也要说明要加载svg.jquery.js和pygal-tooltips.js, 否则不显示tooltips --> 
+    <script type="text/javascript" src="/static/js/svg.jquery.js"></script>
+    <script type="text/javascript" src="/static/js/pygal-tooltips.js"></script>
+    <link rel="stylesheet" href="/static/css/large_svg.css" >        
+   </head>
+  <body> 
+   
+
+    <div id="wrapper" style="width:500px;height:200px;overflow-scroll;overflow-y:hidden;">
+            <figure>
+             {{svg_xml|safe}}  
+            </figure> 
+    </div>
+       
+          
+  </body>
+</html>

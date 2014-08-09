@@ -1,0 +1,166 @@
+{% if not is_xhr|default(false) %}{% extends "base.html" %}{% endif -%}
+                     
+
+{% block sidebar_menu %} 
+      <li {% if root== current_page_code %} class="active" {% endif %}  >
+           <a href="/"><span class="glyphicon glyphicon-th"></span>{{root}}</a>
+       </li>
+    {% for p in pages %}
+       <li {% if p.page_code== current_page_code %} class="active" {% endif %}  >
+           <a href="/pages/{{p.page_code}}">
+             <span class="glyphicon glyphicon-dashboard">
+             </span>{{p.page_title}}
+           </a>
+       </li>
+    {% endfor%}
+{% endblock %}
+ 
+
+
+{% block content %}
+    <div id="overview">  
+    
+        {% for row in pagelet_summary_list|batch(4) %}
+        <div class="row">
+           {% for col in row %}
+            <div class="col-md-3">
+
+                <div
+                   {% if col.summary_status=='Critical'%}
+                     class="panel panel-danger"
+                   {% elif col.summary_status=='Warning'%}
+                     class="panel panel-warning" 
+                   {% elif col.summary_status=='Outdated'%}
+                     class="panel panel-info"
+                   {% else %}
+                     class="panel panel-success"  
+                   {% endif %}
+                 >
+
+                    <div class="panel-heading">
+                       <a href="/pages/{{current_page_code}}#{{col.summary_code}}"> 
+                        <span class="glyphicon glyphicon-import"></span>
+                         {{col.summary_title}}                          
+                       </a> 
+                           {% if col.summary_status=='Critical'%}
+                             <img src="/static/img/critical.png"  width=20 height=20>
+                           {% elif col.summary_status=='Warning'%}
+                             <img src="/static/img/warning.png"  width=20 height=20>
+                           {% elif col.summary_status=='Outdated'%}
+                             <img src="/static/img/outdated.png"  width=20 height=20>
+                           {% else %}
+                             <img src="/static/img/normal.png"  width=20 height=20>
+                           {% endif %}
+                    </div>
+                              
+                    <table class="table table-striped table-bordered">
+                        <tr>
+                            <td>Overview status</td>
+                            <td>{{col.summary_status}}</td>
+                        </tr>
+                        <!-- 
+                        <tr>
+                            <td>Total items</td>
+                            <td>{{col.total_count}}</td>
+                        </tr> 
+                        -->
+                        <tr>
+                            <td>Normal items</td>
+                            <td>{{col.normal_count}}</td>
+                        </tr>
+                        <tr>
+                            <td> Warning items</td>
+                            <td>{{col.warning_count}}</td>
+                        </tr>
+                        <tr>
+                            <td>Critical items</td>
+                            <td>{{col.critical_count}}</td>
+                        </tr>
+                       <tr>
+                            <td>Outdated items</td>
+                            <td>{{col.outdated_count}}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+         
+    </div>     
+    
+    
+ 
+
+ <div id="pagelets">  
+    
+        {% for pagelet in pagelet_components%}
+        <div class="row" id="{{pagelet.pagelet_code}}">
+            <div class="col-md-12">
+                <div class="panel panel-primary">
+                    <div class="panel-heading"><span class="glyphicon glyphicon-import"></span>{{pagelet.pagelet_title}}</div>
+                    <table class="table table-striped table-bordered table-hover">
+                        <tr>
+                            <td class="label-col col-md-3">Item</td>  
+                            <td class="label-col col-md-1">Last value</td>
+                            <td class="label-col col-md-1">Status</td>
+                            <td class="label-col col-md-2">Last timestamp</td>
+                            <td class="label-col col-md-5">Last message</td>
+                        </tr>
+                        
+                        {% for item in pagelet.check_list%}
+                            <tr>
+                                <td >
+                                   {% if item.last_status=='CRITICAL'%}
+                                     <img src="/static/img/critical.png"  width=20 height=20>
+                                   {% elif item.last_status=='WARNING'%}
+                                     <img src="/static/img/warning.png"  width=20 height=20>
+                                   {% elif item.last_status=='NORMAL' and item.is_outdated %}
+                                         <img src="/static/img/outdated.png"  width=20 height=20>
+                                    {%else%}
+                                        <img src="/static/img/normal.png"  width=20 height=20>
+                                   {% endif %}                                
+                                     <a href="/items/{{item.itm_code}}" target="_blank">
+                                       {{item.itm_title}}
+                                     </a>
+                                </td>  
+                                <td >{% if item.last_value != None  %}{{item.last_value}} {% endif %} </td>                            
+                                <td 
+                                   {% if item.last_status=='CRITICAL'  %}
+                                     class="text-danger"
+                                   {% endif %}
+                                   {% if item.last_status=='WARNING'  %}
+                                     class="text-warning"
+                                   {%else%}  
+                                     class="text-success"
+                                   {% endif %}
+                                >
+                                   {% if item.last_status %}{{item.last_status}} {% endif %}
+                                </td> 
+                                
+                                 <td 
+                                   {% if item.is_outdated %}
+                                     class="text-warning"
+                                   {% endif%}
+                                   >{% if item.last_check_timestamp %}
+                                     {{item.last_check_timestamp[:14]}}
+                                    {% endif %} 
+                                 </td>
+                                 
+                                <td >
+                                  {% if item.last_detail_msg %}
+                                    {{item.last_detail_msg[:250]}} 
+                                  {% endif %}
+                                </td>
+                            </tr>                        
+                        {% endfor %} 
+                        
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+         
+    </div>           
+     
+{% endblock %}

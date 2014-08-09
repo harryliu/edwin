@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keywords" content="alerting, monitoring, alert, monitor">
+    <!-- disable auto fresh every 60 seconds -->
+    <!--  
+    <meta http-equiv="refresh" content="60"> 
+    -->  
+
+    <title>Edwin - one alerting and monitoring system</title>
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css" >
+    <link rel="stylesheet" href="/static/css/dashboard.css" >
+        
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="/static/js/html5shiv.js" type="text/javascript"></script>
+    <script src="/static/js/respond.js" type="text/javascript"></script>
+    <![endif]-->
+            
+  </head>  
+  
+  <body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="/">Edwin System V1.0 </a>
+        </div>
+      </div>
+    </div>
+   
+
+    
+    <div  class="container-fluid">
+        <div class="row">
+        
+            
+            <div class="col-sm-12  col-md-12 main">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            {% if category == "error" %}
+                                {category = "danger"}
+                            {% endif %}
+                            <div class="alert alert-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                
+                <div id="content">
+                    {% block content %}{% endblock %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="navbar-fixed-bottom">
+            <div class="panel-footer">
+              Powered by <a href="/">Edwin</a> , designed by Harry Liu. This system is incompatible with IE6~IE8 when SVG chart browsing. Please use Firefox or Chrome or IE9 above. 
+            </div>
+    </div>  
+
+
+
+    <!-- Bootstrap core JavaScript================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="/static/js/jquery.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    
+    
+    <!-- svg JavaScript================== -->
+    <!-- Placed at the end of the document so the pages load faster -->    
+    <script type="text/javascript" src="/static/js/svg.jquery.js"></script>
+    <script type="text/javascript" src="/static/js/pygal-tooltips.js"></script>       
+ 
+       
+  </body>
+
+
+</html>
+
+
+

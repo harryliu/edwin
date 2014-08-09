@@ -1,0 +1,156 @@
+CREATE  TABLE EDWIN_TEAM_CFG
+(  
+ OWNER_TEAM_CODE          NVARCHAR2(50)  
+, EMAIL_TO_LIST           VARCHAR2(255) 
+, SMS_MAIL_TO             VARCHAR2(255)
+, SMS_MAIL_TITLE          NVARCHAR2(255)
+, PHONE_MAIL_TO           VARCHAR2(255)
+, PHONE_MAIL_TITLE        NVARCHAR2(255)
+);
+
+ALTER TABLE EDWIN_TEAM_CFG
+  ADD CONSTRAINT PK_EDWIN_TEAM_CFG PRIMARY KEY (OWNER_TEAM_CODE);
+
+     
+
+
+CREATE TABLE EDWIN_CHECK_ITM_CFG
+(
+ITM_CODE                       NVARCHAR2(50) not null
+,ITM_TITLE                     NVARCHAR2(50) not null
+,ITM_CATEGORY                  NVARCHAR2(50) not null
+,ENABLED_FLAG                  CHAR(1)  default 'Y'  not null
+,HOST                          NVARCHAR2(50)              --only for reference
+,CHECK_SCRIPT                  NVARCHAR2(255)             --only for reference
+,CHECK_INTERVAL_MINUTE         NUMBER    not null         --, -1 for one that need not check outdated  
+,CHECK_VALUE_IS_NUMBER         CHAR(1)   default 'N' not null
+,DESCRIPTION                   NVARCHAR2(255)
+,OWNER_TEAM_LIST               NVARCHAR2(150)   NOT NULL   --  team_code list, delimited by ; or , symbol
+,WARNING_LIMIT                 NUMBER                      --  mandatory column if CHECK_VALUE_IS_NUMBER=Y 
+,CRITICAL_LIMIT                NUMBER                      --  mandatory column if CHECK_VALUE_IS_NUMBER=Y
+,SHADOW_DATA                   VARCHAR2(150)               --  we can use this column to store any data. The value will copy to EDWIN_CHECK_ITM_LOG table when checking result recorded  
+,WARNING_MAIL_CC               VARCHAR2(255)    
+,CRITICAL_MAIL_CC              VARCHAR2(255)   
+,CRITICAL_SMS_FLAG             CHAR(1)  default 'N' NOT NULL   
+,CRITICAL_CALL_FLAG            CHAR(1)  default 'N' NOT NULL
+,ALLOW_REPEATED_SMS_ALARM      CHAR(1)  default 'N' NOT NULL   
+,ALLOW_REPEATED_CALL_ALARM     CHAR(1)  default 'N' NOT NULL
+,ALLOW_REPEATED_MAIL_ALARM     CHAR(1)  default 'N' NOT NULL 
+)
+;
+
+
+ALTER TABLE EDWIN_CHECK_ITM_CFG
+  ADD CONSTRAINT PK_EDWIN_CHECK_ITM_CFG PRIMARY KEY (ITM_CODE);
+
+  
+  
+create table EDWIN_PAGE
+(
+  PAGE_CODE     NVARCHAR2(50) not null,
+  PAGE_TITLE    NVARCHAR2(50) not null,  
+  DISPLAY_FLAG  CHAR(1)  default 'Y' not null,
+  DESCRIPTION   NVARCHAR2(255)
+)  
+; 
+ALTER TABLE EDWIN_PAGE
+  ADD CONSTRAINT PK_EDWIN_PAGE PRIMARY KEY (PAGE_CODE);
+
+     
+ 
+create table EDWIN_PAGELET
+(
+  
+  PAGELET_CODE           NVARCHAR2(50) not null,
+  PAGELET_TITLE          NVARCHAR2(50) not null, 
+  PAGE_CODE              VARCHAR2(50) not null,
+  DISPLAY_ORDER          NUMBER not null,
+  DISPLAY_FLAG           CHAR(1) default 'Y'  not null,
+  DESCRIPTION            NVARCHAR2(255)     
+)
+;
+ALTER TABLE EDWIN_PAGELET
+  ADD CONSTRAINT PK_EDWIN_PAGELET PRIMARY KEY (PAGELET_CODE);
+
+     
+  
+
+create table EDWIN_PAGELET_CHECK_LIST
+(
+  PAGELET_CODE           NVARCHAR2(50) not null,
+  CHECK_ITM_CODE         NVARCHAR2(50) not null,
+  DISPLAY_ORDER          NUMBER not null,
+  DISPLAY_FLAG           CHAR(1) default 'Y'  not null   
+)
+;
+ALTER TABLE EDWIN_PAGELET_CHECK_LIST
+  ADD CONSTRAINT PK_EDWIN_PAGELET_CHECK_LIST PRIMARY KEY (PAGELET_CODE,CHECK_ITM_CODE);
+
+
+
+
+CREATE  TABLE EDWIN_CALENDAR_DAY
+(
+DATE_ID    VARCHAR2(8)
+,WEEK_ID   VARCHAR2(10)
+,MONTH_ID  VARCHAR2(6)
+,YEAR_ID   VARCHAR2(4)
+)
+;
+
+ALTER TABLE EDWIN_CALENDAR_DAY
+  ADD CONSTRAINT PK_EDWIN_CALENDAR_DAY PRIMARY KEY (DATE_ID);
+
+  
+CREATE TABLE EDWIN_CHECK_ITM_STATUS
+( 
+  ITM_CODE                  NVARCHAR2(50) not null,  
+  LAST_CHECK_TIMESTAMP      VARCHAR2(30),
+  LAST_STATUS               VARCHAR2(10),
+  LAST_VALUE                NUMBER,
+  LAST_DETAIL_MSG           nclob,
+  LAST_NOTIFICATION_MSG     nclob,
+  IS_WARNING_EVENT          CHAR(1),
+  IS_CRITICAL_EVENT         CHAR(1),
+  IS_NEW_CRITICAL_EVENT     CHAR(1),
+  IS_NEW_WARNING_EVENT      CHAR(1)
+)
+;
+
+
+ALTER TABLE EDWIN_CHECK_ITM_STATUS
+  ADD CONSTRAINT PK_EDWIN_CHECK_ITM_STATUS PRIMARY KEY (ITM_CODE);
+
+  
+
+  
+CREATE  TABLE EDWIN_CHECK_ITM_LOG
+(
+ITM_CODE                     NVARCHAR2(50) not null
+,CHECK_DATE                  VARCHAR2(10) NOT NULL  --format is '2014-01-17'
+,CHECK_TIMESTAMP             VARCHAR2(30) not NULL  --format is '2014-01-17 16:20:27.783999'
+,CHECK_STATUS                VARCHAR2(50) not NULL
+,CHECK_VALUE                 NUMBER
+,CHECK_DETAIL_MSG            nclob
+,CHECK_NOTIFICATION_MSG      nclob
+,WARNING_LIMIT               NUMBER
+,CRITICAL_LIMIT              NUMBER
+,SHADOW_DATA                 VARCHAR2(150)
+,IS_WARNING_EVENT            CHAR(1)   DEFAULT 'N' NOT NULL
+,IS_CRITICAL_EVENT           CHAR(1)   DEFAULT 'N' NOT NULL
+,IS_NEW_CRITICAL_EVENT       CHAR(1)   DEFAULT 'N' NOT NULL
+,IS_NEW_WARNING_EVENT        CHAR(1)   DEFAULT 'N' NOT NULL
+,ALARM_SEND_STATUS           VARCHAR2(10)   NOT NULL
+,ALARM_SEND_BEGIN_TIME       VARCHAR2(30)
+,ALARM_SEND_END_TIME         VARCHAR2(30)
+)
+;
+
+
+create index IDX_EDWIN_CHECK_ITM_LOG_1 on EDWIN_CHECK_ITM_LOG (ITM_CODE);
+create index IDX_EDWIN_CHECK_ITM_LOG_2 on EDWIN_CHECK_ITM_LOG (CHECK_DATE);
+create index IDX_EDWIN_CHECK_ITM_LOG_3 on EDWIN_CHECK_ITM_LOG (CHECK_TIMESTAMP);
+
+
+
+    
