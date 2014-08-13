@@ -426,10 +426,11 @@ class dashboard_check_cfg(object):
             else:
                 rowFactory = DbRowFactory(cr, cls.FULL_NAME)
                 row = rowFactory.fetchOneRowObject()
-                if row.warning_mail_cc is None:
-                    row.warning_mail_cc = ""
-                if row.critical_mail_cc is None:
-                    row.critical_mail_cc = ""
+				if row:
+					if row.warning_mail_cc is None:
+						row.warning_mail_cc = ""
+					if row.critical_mail_cc is None:
+						row.critical_mail_cc = ""
                 return row
 
     def updateStatus(self, check_value, check_status, check_timestamp, detail_msg, notification_msg=''):

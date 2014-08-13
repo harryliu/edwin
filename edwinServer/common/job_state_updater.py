@@ -21,7 +21,7 @@ class JobStateUpdater(object):
         self.logger.debug('Check item cfg object: %s' % (self.check_cfg))
 
     def isUndefinedCheckItem(self):
-        return not self.check_cfg
+        return self.check_cfg is None
 
     def resultShouldBeNumerical(self):
         return self.check_cfg.check_value_is_number == 'Y'

@@ -6,6 +6,7 @@ Created on 2014-2-10
 from __future__ import absolute_import
 from flask import Blueprint, abort, request, flash, jsonify
 from ...common.job_state_updater import JobStateUpdater
+from flask.globals import current_app
 
 
 mod = Blueprint('checks', __name__)  # register the users blueprint module
@@ -30,23 +31,26 @@ mod = Blueprint('checks', __name__)  # register the users blueprint module
 def saveCheckResultAPI_view(check_itm_code):
     state_updater = JobStateUpdater(check_itm_code)
     if state_updater.isUndefinedCheckItem():
-        flash('Undefined check item %s.' % check_itm_code, 'error')
+        current_app.logger.error('saveCheckResultAPI_view(): undefined check item %s'%check_itm_code)
+        flash('Undefined check item %s' % check_itm_code, 'error')
         abort(404)  # page not found
 
     if not request.json:
+        current_app.logger.error('saveCheckResultAPI_view(): payload json must be set.')
         abort(400)  # bad request
 
     if state_updater.resultShouldBeNumerical():
         if not 'value' in request.json:
+            current_app.logger.error('saveCheckResultAPI_view(): value must be set for numerical check item')
             abort(400)  # bad request
         else:
             value = request.json['value']
-
             detail_msg = request.json.get('detail_msg', "")
             notification_msg = request.json.get('notification_msg', "")
             state_updater.updateNumericalResult(value, detail_msg, notification_msg)
     else:
         if not request.json or not 'status' in request.json:
+            current_app.logger.error('saveCheckResultAPI_view(): status must be set for non-numerical check item')
             abort(400)  # bad request
         else:
             status = request.json['status']
@@ -59,22 +63,12 @@ def saveCheckResultAPI_view(check_itm_code):
 
 @mod.route("/api/v1.0/exceptions/<check_itm_code>", methods=('POST', 'GET'))
 def registerExceptionAPI_view(check_itm_code):
+    exception_msg = request.json.get('exception_msg', "No exception message provided.")
     state_updater = JobStateUpdater(check_itm_code)
     if state_updater.isUndefinedCheckItem():
-        # abort(404)  # check item not found
-        return jsonify({'echo_msg': 'Check item %s not found' % (check_itm_code)}), 400
-
-    if not request.json:
-        # abort(400)  # bad request
-        return jsonify({'echo_msg': 'Request json data not found'}), 400
-
-    if not 'exception_msg' in request.json:
-        # abort(400)  # bad request
-        return jsonify({'echo_msg': 'No exception_msg in the request json data'}), 400
-    else:
-        exception_msg = request.json.get('exception_msg', "")
-        state_updater.registerCheckingException(exception_msg)
-
+        exception_msg="Check item %s not found. The original message: %s"%(check_itm_code, exception_msg) 
+    current_app.logger.error('registerExceptionAPI_view(), Exception message: %s'%exception_msg)    
+    state_updater.registerCheckingException(exception_msg)
     return jsonify({'echo_msg': 'successful'}), 201
 
 
