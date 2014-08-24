@@ -120,7 +120,7 @@
                             <td><b>Last message</b></td>
                             <td colspan=3>
                               {% if check_item.last_detail_msg %}
-                                {{check_item.last_detail_msg[:1000]}}
+                                {{check_item.last_detail_msg|safe}}
                               {% endif %}                            
                             </td>
                         </tr>                        

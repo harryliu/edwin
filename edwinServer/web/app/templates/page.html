@@ -149,7 +149,7 @@
                                  
                                 <td >
                                   {% if item.last_detail_msg %}
-                                    {{item.last_detail_msg[:250]}} 
+                                    {{item.last_detail_msg[:250]|safe}} 
                                   {% endif %}
                                 </td>
                             </tr>                        
