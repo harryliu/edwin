@@ -906,7 +906,7 @@ class Summary(object):
             left join edwin_pagelet pl on p.page_code=pl.page_code and pl.display_flag='Y'
             left join edwin_pagelet_check_list cl on pl.pagelet_code=cl.pagelet_code and cl.display_flag='Y'
             left join edwin_check_itm_cfg cfg on cfg.itm_code=cl.check_itm_code and cfg.enabled_flag='Y'
-            left join edwin_check_itm_status ck on ck.itm_code=cl.check_itm_code  
+            left join edwin_check_itm_status ck on ck.itm_code=cfg.itm_code  
             where 1=1
             and p.display_flag='Y'
             GROUP BY p.page_code, p.page_title                
@@ -965,7 +965,7 @@ class Summary(object):
         join edwin_pagelet pl on p.page_code=pl.page_code and  pl.display_flag='Y'
         join edwin_pagelet_check_list cl on pl.pagelet_code=cl.pagelet_code and cl.display_flag='Y'
         join edwin_check_itm_cfg cfg on cfg.itm_code=cl.check_itm_code and cfg.enabled_flag='Y'
-        left join edwin_check_itm_status ck on ck.itm_code=cl.check_itm_code 
+        left join edwin_check_itm_status ck on ck.itm_code=cfg.itm_code
         where 1=1           
         and p.page_code=?
         GROUP BY pl.pagelet_code, pl.pagelet_title, pl.display_order
