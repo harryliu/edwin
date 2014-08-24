@@ -5,8 +5,9 @@ Created on 2014-2-10
 '''
 from __future__ import absolute_import
 from flask import Blueprint, abort, request, flash, jsonify
-from ...common.job_state_updater import JobStateUpdater
 from flask.globals import current_app
+from ...common.job_state_updater import JobStateUpdater
+from ...common.model_meta import dashboard_check_cfg
 
 
 mod = Blueprint('checks', __name__)  # register the users blueprint module
@@ -27,30 +28,44 @@ mod = Blueprint('checks', __name__)  # register the users blueprint module
 '''
 
 
+@mod.route("/api/v1.0/info/<check_itm_code>", methods=('GET', 'POST'))
+def getCheckItemCfg_view(check_itm_code):
+    cfg = dashboard_check_cfg.getCfgInDb(check_itm_code)
+    if cfg is None:
+        flash('Undefined check item %s.' % check_itm_code, 'error')
+        current_app.logger.error('getCheckItemCfg_view() function: Undefined check item %s.' % check_itm_code)
+        abort(404)  # page not found
+    else:
+        dic = {'itm_code': cfg.itm_code, 'itm_title': cfg.itm_title, 'itm_category': cfg.itm_category, 'enabled_flag': cfg.enabled_flag, 'host': cfg.host, 'check_script': cfg.check_script, 'check_interval_minute': cfg.check_interval_minute, 'check_value_is_number': cfg.check_value_is_number, 'description': cfg.description, 'warning_limit': cfg.warning_limit, 'critical_limit': cfg.critical_limit, 'shadow_data': cfg.shadow_data, 'owner_team_list': cfg.owner_team_list, 'warning_mail_cc': cfg.warning_mail_cc, 'critical_mail_cc': cfg.critical_mail_cc, 'critical_sms_flag': cfg.critical_sms_flag, 'critical_call_flag': cfg.critical_call_flag, 'allow_repeated_sms_alarm': cfg.allow_repeated_sms_alarm, 'allow_repeated_call_alarm': cfg.allow_repeated_call_alarm, 'allow_repeated_mail_alarm': cfg.allow_repeated_mail_alarm
+               }
+        return jsonify(dic), 201
+
+
+@mod.route("/api/v1.0/results/<check_itm_code>", methods=('POST', 'GET'))
 @mod.route("/api/v1.0/checks/<check_itm_code>", methods=('POST', 'GET'))
 def saveCheckResultAPI_view(check_itm_code):
     state_updater = JobStateUpdater(check_itm_code)
     if state_updater.isUndefinedCheckItem():
-        current_app.logger.error('saveCheckResultAPI_view(): undefined check item %s'%check_itm_code)
-        flash('Undefined check item %s' % check_itm_code, 'error')
+        flash('Undefined check item %s.' % check_itm_code, 'error')
+        current_app.logger.error('saveCheckResultAPI_view() function: Undefined check item %s.' % check_itm_code)
         abort(404)  # page not found
 
     if not request.json:
-        current_app.logger.error('saveCheckResultAPI_view(): payload json must be set.')
+        current_app.logger.error('saveCheckResultAPI_view() function: Payload json must be set.')
         abort(400)  # bad request
 
     if state_updater.resultShouldBeNumerical():
         if not 'value' in request.json:
-            current_app.logger.error('saveCheckResultAPI_view(): value must be set for numerical check item')
+            current_app.logger.error('saveCheckResultAPI_view() function: value must be set.')
             abort(400)  # bad request
         else:
             value = request.json['value']
+
             detail_msg = request.json.get('detail_msg', "")
             notification_msg = request.json.get('notification_msg', "")
             state_updater.updateNumericalResult(value, detail_msg, notification_msg)
     else:
         if not request.json or not 'status' in request.json:
-            current_app.logger.error('saveCheckResultAPI_view(): status must be set for non-numerical check item')
             abort(400)  # bad request
         else:
             status = request.json['status']
@@ -63,11 +78,11 @@ def saveCheckResultAPI_view(check_itm_code):
 
 @mod.route("/api/v1.0/exceptions/<check_itm_code>", methods=('POST', 'GET'))
 def registerExceptionAPI_view(check_itm_code):
-    exception_msg = request.json.get('exception_msg', "No exception message provided.")
+    exception_msg = request.json.get('exception_msg', "No exception provided.")
     state_updater = JobStateUpdater(check_itm_code)
     if state_updater.isUndefinedCheckItem():
-        exception_msg="Check item %s not found. The original message: %s"%(check_itm_code, exception_msg) 
-    current_app.logger.error('registerExceptionAPI_view(), Exception message: %s'%exception_msg)    
+        exception_msg = "Check item %s not found. The original message: %s" % (check_itm_code, exception_msg)
+    current_app.logger.error('registerExceptionAPI_view(), Exception message: %s' % exception_msg)
     state_updater.registerCheckingException(exception_msg)
     return jsonify({'echo_msg': 'successful'}), 201
 
