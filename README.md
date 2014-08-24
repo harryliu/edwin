@@ -29,9 +29,9 @@ Let us to break down several steps below,
    For warning events, they will be sent via email.
    For critical events, they can be sent via SMS and calling if you want.    
 2. Edwin allows you to customize alarm delivery options, includes,
-   one option to allow repeated email alarm
-   one option to allow repeated SMS alarm
-   one option to allow repeated call alarm 
+   one option to allow repeated email alarm 
+   one option to allow repeated SMS alarm  
+   one option to allow repeated call alarm  
 3. Basic statistics trend charts are available for every check item.
 
 
