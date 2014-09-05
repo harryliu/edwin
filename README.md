@@ -39,3 +39,7 @@ edwin对于监控项目的组织形式, 由小到大是:  check item -> pagelet 
 4. 重复警告的处理
 谁都不想收到一堆重复的警告, 尤其是不那么重要或者检查频率高的check item, edwin为每个check item提供三个开关来控制是否允许重复告警, 分别是ALLOW_REPEATED_MAIL_ALARM、ALLOW_REPEATED_SMS_ALARM和ALLOW_REPEATED_CALL_ALARM
 5. Web提供为每个check item提供基本的趋势图， 帮助我们回顾检查的结果
+
+## 抓图
+<img src="https://github.com/harryliu/edwin/blob/master/docs/screenshots/dashboard.png" width="" height="" border="0" alt="dashboard">
+<img src="https://github.com/harryliu/edwin/blob/master/docs/screenshots/page.png" width="" height="" border="0" alt="page">
