@@ -1,4 +1,4 @@
-##Server side setup
+﻿##Server side setup
 
 ###Database setup  
 1. create tables, the SQL file is db_setup/DDL/oracle.sql. 
