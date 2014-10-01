@@ -123,7 +123,7 @@ class MailSender(object):
 
         if self.currentAlarm.check_status == const.CHECK_STATUS_WARN:
             # warning alarm
-            if self.currentAlarm.is_new_warning_event:
+            if self.currentAlarm.is_new_warning_event == 'Y':
                 self.logger.info("It is a new warning alarm. It will send email.")
                 self._sendByEmail()
             else:
@@ -134,7 +134,7 @@ class MailSender(object):
                     self.logger.info("Email repeated alarm is bypassed.")
 
         else:  # critical alarm
-            if self.currentAlarm.is_new_critical_event:
+            if self.currentAlarm.is_new_critical_event == 'Y':
                 self.logger.info("It is a new critical alarm. It will send email.")
                 self._sendByEmail()
                 if self.currentCheckCfg.critical_call_flag == 'Y':
@@ -169,7 +169,7 @@ class MailSender(object):
         else:
             prefix = const.EMAIL_SUBJECT_PREFIX_WARN
             (mailTo, mailCc) = self._getWarnEMailRecipients()
-        subject = "%s, check item: %s" % (prefix, self.current_itm_code)
+        subject = "%s, check item: %s" % (prefix, self.currentCheckCfg.itm_title)
 
         msg = self.currentAlarm.check_notification_msg
         if msg is None or msg.strip() == '':
@@ -179,6 +179,7 @@ class MailSender(object):
             body = '''Please find details below, 
             <br>%s 
             <br>==================== 
+            <br>Check item code :%s 
             <br>Warning limit :%s
             <br>Critical limit: %s
             <br>Current check value: %s
@@ -187,6 +188,7 @@ class MailSender(object):
             <br>====================
             <br><a href="%s/items/%s" target="_blank">Click this link to find more details.</a> 
             ''' % (msg,
+                   self.current_itm_code,
                    self.currentAlarm.warning_limit,
                    self.currentAlarm.critical_limit,
                    self.currentAlarm.check_value,
@@ -199,11 +201,13 @@ class MailSender(object):
             body = '''Please find details below, 
             <br>%s 
             <br>====================  
+            <br>Check item code: %s 
             <br>Current check status: %s 
             <br>Current check timestamp: %s
             <br>====================
             <br><a href="%s/items/%s" target="_blank">Click this link to find more details.</a>             
             ''' % (msg,
+                   self.current_itm_code,
                    self.currentAlarm.check_status,
                    self.currentAlarm.check_timestamp,
                    conf.web_url,
@@ -221,7 +225,7 @@ class MailSender(object):
         for team in teams:
             (to, title) = team
             prefix = const.EMAIL_SUBJECT_PREFIX_CRITICAL
-            body = "%s, check item: %s. Please check details in your mailbox. " % (prefix, self.current_itm_code)
+            body = "%s, check item: %s. Please check details in your mailbox. " % (prefix, self.currentCheckCfg.itm_title)
             self._executeSendCmd([to], [], title, body)
 
         self.logger.info("End to send SMS alarm.")
@@ -233,7 +237,7 @@ class MailSender(object):
         for team in teams:
             (to, title) = team
             prefix = const.EMAIL_SUBJECT_PREFIX_CRITICAL
-            body = "%s, check item: %s. Please check details in your mailbox. " % (prefix, self.current_itm_code)
+            body = "%s, check item: %s. Please check details in your mailbox. " % (prefix, self.currentCheckCfg.itm_title)
             self._executeSendCmd([to], [], title, body)
 
         self.logger.info("End to send CallPhone alarm.")
