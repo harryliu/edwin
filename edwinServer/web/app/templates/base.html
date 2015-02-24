@@ -62,14 +62,16 @@
              {% with messages = get_flashed_messages(with_categories=true) %}
                  {% if messages %}
                      {% for category, message in messages %}
-                         {% if category == "error" %}
-                             {category = "danger"}
+                         {% if category == "error" %}                             
+                             <div class="alert alert-danger">{{ message }}</div>
+                         {% else %}   
+                             <div class="alert alert-{{category}}">{{ message }}</div>
                          {% endif %}
-                         <div class="alert alert-{{ category }}">{{ message }}</div>
                      {% endfor %}
                  {% endif %}
              {% endwith %}
              
+         
              
              
              <div id="content">
