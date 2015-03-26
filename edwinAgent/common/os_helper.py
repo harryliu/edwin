@@ -131,9 +131,9 @@ def waitAndLogResultOfCmdProcess(process, logFile, processStartTime=None):
 
 
 def getFileLastModifiyTime(fname):
-    mtime = time.ctime(os.stat(fname).st_mtime)
-    tim = datetime.strptime(mtime[8:], "%d %H:%M:%S %Y")
-    return tim
+    mtime=time.ctime(os.stat(fname).st_mtime) 
+    tim=datetime.strptime(mtime,'%a %b %d %H:%M:%S %Y') 
+    return tim 
 
 
 def getPath(fullFileName):
